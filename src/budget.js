@@ -1,6 +1,6 @@
 import { extension_settings, getContext } from '../../../../extensions.js';
 import { getTokenCountAsync } from '../../../../tokenizers.js';
-import { getExtensionPrompt, extension_prompt_types } from '../../../../../script.js';
+import { extension_prompts, getExtensionPrompt, extension_prompt_types } from '../../../../../script.js';
 import { oai_settings } from '../../../../openai.js';
 
 // budget source = oai_settings.openai_max_context (screenshot 120000)
@@ -29,10 +29,10 @@ export async function collectInjectionTokens() {
             total += t;
         } catch { breakdown.push({ type: String(type), tokens: 0, error: true }); }
     }
-    // per extension key via global extension_prompts
+    // per extension key via imported extension_prompts
     const perExt = [];
     try {
-        const extPrompts = (window.extension_prompts || window['extension_prompts'] || {});
+        const extPrompts = extension_prompts || {};
         for (const [key, obj] of Object.entries(extPrompts)) {
             if (!obj || !obj.value) continue;
             const t = await getTokenCountAsync(String(obj.value), 0).catch(() => 0);

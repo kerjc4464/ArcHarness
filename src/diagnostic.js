@@ -1,5 +1,5 @@
 // 双轨诊断: fetch 劫持抓真实 + generate_interceptor 抓预测
-import { extension_prompt_types, extension_prompt_roles } from '../../../../../script.js';
+import { extension_prompt_types, extension_prompt_roles, extension_prompts } from '../../../../../script.js';
 import { getExtensionPrompt } from '../../../../../script.js';
 import { getTokenCountAsync } from '../../../../tokenizers.js';
 
@@ -97,7 +97,7 @@ export async function capturePredicted(chat, contextSize, type) {
     const allPrompts = {};
     // capture all known extension_prompts values
     try {
-        const extPrompts = window.extension_prompts || {};
+        const extPrompts = extension_prompts || {};
         for (const [k, v] of Object.entries(extPrompts)) {
             allPrompts[k] = {
                 value: String(v.value || '').slice(0, 8000),
