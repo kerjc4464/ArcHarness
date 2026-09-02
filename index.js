@@ -957,15 +957,19 @@ async function initUI() {
     document.getElementById('ah-llm-apply')?.addEventListener('click', doLLMApply);
     document.getElementById('ah-llm-test')?.addEventListener('click', doLLMTest);
 
-        // Turbo Max 温柔 — 无功能，纯悬浮安慰（15s 气泡 + 温柔红）
+        // Turbo Max — 三段点：ESR32 → ESR64 → 温柔（循环，15s 气泡 + 温柔红）
     (function bindTurboGentle() {
         const btn = document.getElementById('ah-turbo-max-gentle');
         const bubble = document.getElementById('ah-gentle-bubble');
         if (!btn || !bubble) return;
         let hideTimer = null;
         let fadeTimer = null;
+        let step = 0;
+        const texts = ['Turbo ESR32', 'Turbo ESR64', '休息一下吧，也对自己温柔一点'];
         function showGentle() {
             btn.classList.add('is-active');
+            bubble.textContent = texts[step % texts.length];
+            step = (step + 1) % texts.length;
             bubble.classList.add('show');
             bubble.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
             bubble.style.opacity = '';
