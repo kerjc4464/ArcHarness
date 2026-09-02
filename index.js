@@ -965,7 +965,7 @@ async function initUI() {
         let hideTimer = null;
         let fadeTimer = null;
         let step = 0;
-        const texts = ['Turbo ESR32', 'Turbo ESR64', '休息一下吧，也对自己温柔一点'];
+        const texts = ['Turbo ESR32', 'Turbo ESR64', '休息一下吧，也对自己温柔一点...'];
         function showGentle() {
             btn.classList.add('is-active');
             const idx = step < 2 ? step : 2;
