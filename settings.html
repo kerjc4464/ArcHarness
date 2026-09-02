@@ -2,13 +2,19 @@
   <div class="ah-row" style="justify-content:space-between; margin-bottom:8px;">
     <div class="ah-row">
       <b style="font-size:14px;">ArcHarness</b>
-      <span class="ah-badge">v0.2.0</span>
+      <span class="ah-badge">v0.2.1</span>
       <span id="ah-status" class="ah-badge ok">就绪</span>
     </div>
     <div class="ah-row">
       <label style="font-size:11px; display:flex; align-items:center; gap:4px;"><input type="checkbox" id="ah-enabled" /> 启用</label>
       <label style="font-size:11px; display:flex; align-items:center; gap:4px;"><input type="checkbox" id="ah-debug" /> Debug</label>
     </div>
+  </div>
+
+  <!-- Turbo Max 温柔悬浮 — 独立于所有 Tab/页面按钮之上 -->
+  <div class="ah-turbo-wrap" aria-live="polite">
+    <div id="ah-turbo-max-gentle" class="ah-turbo-gentle" role="button" tabindex="0" aria-label="Turbo Max — 对自己温柔一点" title="对自己温柔一点">Turbo Max</div>
+    <div id="ah-gentle-bubble" class="ah-gentle-bubble" role="status">休息一下吧，也对自己温柔一点</div>
   </div>
 
   <div class="ah-tabs">
@@ -29,14 +35,14 @@
         <span id="ah-budget-max" class="ah-badge">120000</span>
       </div>
       <div class="ah-progress" style="margin:8px 0;"><div id="ah-budget-bar" style="width:0%; background:linear-gradient(90deg,#d01e3b,#7c3aed);"></div></div>
-      <div class="ah-row" style="justify-content:space-between; font-size:11px; color:#a1a1aa;">
+      <div class="ah-row ah-budget-metrics" style="justify-content:space-between; font-size:11px; color:#a1a1aa;">
         <span>已用: <b id="ah-budget-used">-</b></span>
         <span>注入: <b id="ah-budget-inj">-</b></span>
         <span>剩余: <b id="ah-budget-rem">-</b></span>
         <span id="ah-budget-pct" class="ah-badge">0%</span>
       </div>
       <div id="ah-budget-breakdown" class="ah-log" style="margin-top:8px; max-height:140px;">等待生成...</div>
-      <div class="ah-row" style="margin-top:6px;">
+      <div class="ah-row ah-budget-actions" style="margin-top:6px;">
         <div id="ah-budget-refresh" class="ah-btn secondary" style="padding:4px 8px; font-size:11px;">刷新</div>
         <div id="ah-budget-sim" class="ah-btn secondary" style="padding:4px 8px; font-size:11px;">模拟当前</div>
       </div>
@@ -49,7 +55,7 @@
 
   <!-- 诊断 -->
   <div class="ah-pane" id="ah-pane-diagnostic">
-    <div class="ah-row" style="gap:6px; margin-bottom:6px;">
+    <div class="ah-row ah-diag-mode-row" style="gap:6px; margin-bottom:6px;">
       <select id="ah-diag-mode" class="ah-select">
         <option value="real">上一次真实发送 (Fetch)</option>
         <option value="predicted">上一次预测 (Interceptor)</option>
@@ -60,7 +66,7 @@
       <input id="ah-diag-filter" class="ah-input" placeholder="过滤关键词" style="flex:1;" />
       <div id="ah-diag-refresh" class="ah-btn secondary">刷新</div>
     </div>
-    <div class="ah-row" style="gap:6px; margin-bottom:6px;">
+    <div class="ah-row ah-diag-action-row" style="gap:6px; margin-bottom:6px;">
       <div id="ah-diag-capture" class="ah-btn">捕获当前</div>
       <div id="ah-diag-copy" class="ah-btn secondary">复制JSON</div>
       <div id="ah-diag-export" class="ah-btn secondary">导出TXT</div>
@@ -72,11 +78,11 @@
   <!-- Soul -->
   <div class="ah-pane" id="ah-pane-soul">
     <div class="ah-card">
-      <div class="ah-row" style="justify-content:space-between;">
+      <div class="ah-row ah-soul-head-row" style="justify-content:space-between;">
         <b>Soul 统筹 — EXtreme 主 → ViGil 镜像</b>
         <span class="ah-badge">单向</span>
       </div>
-      <div class="ah-row" style="margin-top:6px;">
+      <div class="ah-row ah-soul-actions" style="margin-top:6px;">
         <div id="ah-soul-refresh" class="ah-btn secondary">刷新对比</div>
         <div id="ah-soul-sync-selected" class="ah-btn">同步选中 → ViGil</div>
         <div id="ah-soul-sync-all" class="ah-btn secondary">同步全部缺失</div>
@@ -306,7 +312,7 @@
     <div class="ah-card">
       <b>关于</b>
       <div style="font-size:11px; color:#a1a1aa; line-height:1.6;">
-        ArcHarness v0.2.0 — Arc 套件中枢<br/>
+        ArcHarness v0.2.1 — Arc 套件中枢<br/>
         Soul: EXtreme 主 → ViGil 镜像 (单向)<br/>
         诊断: Fetch 真实 + Interceptor 预测 双轨<br/>
         预算: oai_settings.openai_max_context<br/>

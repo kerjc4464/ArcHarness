@@ -112,7 +112,7 @@ async function refreshSoul() {
                 const tr = document.createElement('tr');
                 const enabled = ext.enabledMap ? ext.enabledMap[r.name] !== false : true;
                 const badge = r.state === 'both' ? '<span class="ah-badge ok">一致</span>' : r.state === 'only_extreme' ? '<span class="ah-badge warn">仅EXtreme</span>' : '<span class="ah-badge">仅ViGil</span>';
-                tr.innerHTML = `<td><input type="checkbox" class="ah-soul-check" data-name="${r.name}" ${r.state !== 'both' || r.note ? 'checked' : ''} /></td><td>${r.name} ${enabled === false ? '<small style="color:#f87171;">(禁用)</small>' : ''}</td><td>${badge}</td><td>${r.extreme ? (r.extreme.filename + (r.extreme.size_bytes ? ` ${r.extreme.size_bytes}B` : '')) : '-'}</td><td>${r.vigil ? r.vigil.filename : '-'}</td><td>${r.note || ''}</td>`;
+                tr.innerHTML = `<td data-label=""><input type="checkbox" class="ah-soul-check" data-name="${r.name}" ${r.state !== 'both' || r.note ? 'checked' : ''} /></td><td data-label="名称">${r.name} ${enabled === false ? '<small style="color:#f87171;">(禁用)</small>' : ''}</td><td data-label="状态">${badge}</td><td data-label="EXtreme">${r.extreme ? (r.extreme.filename + (r.extreme.size_bytes ? ` ${r.extreme.size_bytes}B` : '')) : '-'}</td><td data-label="ViGil">${r.vigil ? r.vigil.filename : '-'}</td><td data-label="备注">${r.note || ''}</td>`;
                 tbody.appendChild(tr);
             }
         }
@@ -956,6 +956,43 @@ async function initUI() {
     }
     document.getElementById('ah-llm-apply')?.addEventListener('click', doLLMApply);
     document.getElementById('ah-llm-test')?.addEventListener('click', doLLMTest);
+
+        // Turbo Max 温柔 — 无功能，纯悬浮安慰（15s 气泡 + 温柔红）
+    (function bindTurboGentle() {
+        const btn = document.getElementById('ah-turbo-max-gentle');
+        const bubble = document.getElementById('ah-gentle-bubble');
+        if (!btn || !bubble) return;
+        let hideTimer = null;
+        let fadeTimer = null;
+        function showGentle() {
+            btn.classList.add('is-active');
+            bubble.classList.add('show');
+            bubble.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+            bubble.style.opacity = '';
+            if (hideTimer) clearTimeout(hideTimer);
+            if (fadeTimer) clearTimeout(fadeTimer);
+            // 13s 后开始 2s 淡出，合计 15s
+            hideTimer = setTimeout(() => {
+                bubble.style.transition = 'opacity 2s ease, transform 2s ease';
+                bubble.classList.remove('show');
+                fadeTimer = setTimeout(() => {
+                    bubble.style.transition = '';
+                }, 2050);
+            }, 13000);
+        }
+        function dismissGentle() {
+            if (hideTimer) clearTimeout(hideTimer);
+            if (fadeTimer) clearTimeout(fadeTimer);
+            bubble.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+            bubble.classList.remove('show');
+            setTimeout(() => { bubble.style.transition = ''; }, 400);
+        }
+        btn.addEventListener('click', showGentle);
+        btn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showGentle(); }
+        });
+        bubble.addEventListener('click', dismissGentle);
+    })();
 
     // updater
     const tok = document.getElementById('ah-gh-token'); if (tok) tok.value = s.updater.githubToken || '';

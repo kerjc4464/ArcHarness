@@ -13,6 +13,7 @@
 }
 
 .archarness-panel {
+  position: relative;
   background: var(--ah-bg);
   border: 1px solid var(--ah-border);
   border-radius: 12px;
@@ -20,7 +21,98 @@
   /* 防止窄容器横向溢出 */
   max-width: 100%;
   overflow-x: hidden;
+  overflow-y: visible;
   box-sizing: border-box;
+}
+
+.ah-turbo-wrap {
+  position: absolute;
+  top: 9px;
+  right: 12px;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none;
+}
+#archarness-panel > .ah-row:first-child {
+  padding-right: 108px;
+  box-sizing: border-box;
+}
+.ah-turbo-gentle {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 13px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  border: 1px solid var(--ah-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ah-sub);
+  opacity: 0.92;
+  transition: background 0.28s ease, border-color 0.28s ease, color 0.28s ease, opacity 0.28s ease, box-shadow 0.28s ease, transform 0.15s ease;
+}
+.ah-turbo-gentle:hover {
+  opacity: 0.95;
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+.ah-turbo-gentle.is-active {
+  background: rgba(248, 113, 113, 0.14);
+  border-color: rgba(248, 113, 113, 0.28);
+  color: #fecaca;
+  opacity: 1;
+  box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.1), 0 4px 14px rgba(248, 113, 113, 0.12);
+}
+.ah-turbo-gentle:focus-visible {
+  outline: 2px solid rgba(248, 113, 113, 0.5);
+  outline-offset: 2px;
+}
+.ah-turbo-gentle:active {
+  transform: scale(0.97);
+}
+/* 气泡 — 15s 长驻，最后 2s 淡出由 JS 控制 transition */
+.ah-gentle-bubble {
+  pointer-events: auto;
+  max-width: 220px;
+  background: linear-gradient(180deg, rgba(28, 20, 24, 0.98), rgba(22, 18, 22, 0.98));
+  border: 1px solid rgba(248, 113, 113, 0.22);
+  color: #fecaca;
+  font-size: 12.5px;
+  line-height: 1.5;
+  padding: 9px 14px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(248, 113, 113, 0.06);
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+}
+.ah-gentle-bubble::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 22px;
+  width: 10px;
+  height: 10px;
+  background: rgba(28, 20, 24, 0.98);
+  border-left: 1px solid rgba(248, 113, 113, 0.22);
+  border-top: 1px solid rgba(248, 113, 113, 0.22);
+  transform: rotate(45deg);
+}
+.ah-gentle-bubble.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .ah-tabs {
@@ -30,6 +122,8 @@
   border-bottom: 1px solid var(--ah-border);
   padding-bottom: 8px;
   margin-bottom: 10px;
+  position: relative;
+  box-sizing: border-box;
 }
 
 .ah-tab {
@@ -256,10 +350,13 @@
 /* ================= 移动端 / 窄容器优化（抽屉宽度 <560px 即使视口是桌面） ================= */
 @container ah (max-width: 560px) {
   .archarness-panel { padding: 10px 8px; border-radius: 10px; }
-  /* 顶部 Tab 触控更大 */
-  .ah-tabs { gap: 6px; }
-  .ah-tab { padding: 8px 11px; font-size: 12.5px; line-height: 1.1; }
-  .ah-tabs-sub .ah-tab { padding: 7px 12px; font-size: 12px; }
+  /* 顶部 Tab 触控更大 + 横向可滑不换行挤压 */
+  .ah-tabs { gap: 6px; flex-wrap: nowrap !important; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 8px; scroll-snap-type: x proximity; }
+  .ah-tabs::-webkit-scrollbar { display: none; }
+  .ah-tab { padding: 8px 11px; font-size: 12.5px; line-height: 1.1; flex-shrink: 0; scroll-snap-align: start; }
+  .ah-tabs-sub { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; }
+  .ah-tabs-sub::-webkit-scrollbar { display: none; }
+  .ah-tabs-sub .ah-tab { padding: 7px 12px; font-size: 12px; flex-shrink: 0; }
   /* 健康卡：已在上方折为单列，此处细化可读性 */
   .ah-health-card { padding: 11px 12px; border-radius: 12px; }
   .ah-health-title { font-size: 13px; }
@@ -274,6 +371,45 @@
   #ah-health-grid + .ah-row .ah-row { width: 100% !important; justify-content: flex-start !important; flex-wrap: wrap !important; gap: 8px !important; }
   #ah-health-grid + .ah-row .ah-row span { font-size: 11px !important; line-height: 1.4 !important; white-space: normal !important; margin-left: 0 !important; }
   #ah-health-refresh { padding: 7px 12px !important; font-size: 12px !important; }
+  /* ========== Soul 统筹：窄屏卡片化，彻底取消横向滚动 ========== */
+  #ah-soul-table-wrap { overflow: visible !important; padding: 0 !important; background: transparent !important; border: none !important; }
+  #ah-soul-table { min-width: 0 !important; width: 100% !important; border-collapse: separate !important; }
+  #ah-soul-table thead { display: none !important; }
+  #ah-soul-table, #ah-soul-table tbody { display: block !important; width: 100% !important; }
+  #ah-soul-table tr { display: block !important; width: 100% !important; box-sizing: border-box; background: rgba(10,10,15,0.92); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 10px 10px 6px; margin-bottom: 10px; position: relative; }
+  #ah-soul-table td { display: flex !important; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 7px 0 !important; border: none !important; border-bottom: 1px dashed rgba(255,255,255,0.06) !important; font-size: 12.5px; line-height: 1.45; text-align: right; word-break: break-all; }
+  #ah-soul-table td:last-child { border-bottom: none !important; }
+  #ah-soul-table td:first-child { justify-content: flex-start !important; padding-bottom: 8px !important; margin-bottom: 2px; border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
+  #ah-soul-table td:first-child input[type="checkbox"] { width: 18px; height: 18px; flex-shrink: 0; }
+  #ah-soul-table td:not(:first-child)::before { content: attr(data-label); font-size: 11px; color: var(--ah-sub); flex-shrink: 0; text-align: left; min-width: 56px; padding-top: 1px; font-weight: 600; }
+  /* 兜底：若未注入 data-label 则用 nth-child 伪内容（保证旧缓存也卡片化） */
+  #ah-soul-table td:nth-child(2)[data-label=""]::before, #ah-soul-table td:nth-child(2):not([data-label])::before { content: "名称"; }
+  #ah-soul-table td:nth-child(3)[data-label=""]::before, #ah-soul-table td:nth-child(3):not([data-label])::before { content: "状态"; }
+  #ah-soul-table td:nth-child(4)[data-label=""]::before, #ah-soul-table td:nth-child(4):not([data-label])::before { content: "EXtreme"; }
+  #ah-soul-table td:nth-child(5)[data-label=""]::before, #ah-soul-table td:nth-child(5):not([data-label])::before { content: "ViGil"; }
+  #ah-soul-table td:nth-child(6)[data-label=""]::before, #ah-soul-table td:nth-child(6):not([data-label])::before { content: "备注"; }
+  /* Soul 标题与按钮：纵向堆叠，触控更大 */
+  #ah-pane-soul > .ah-card:first-child > .ah-row:first-child { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
+  #ah-pane-soul > .ah-card:first-child > .ah-row:first-child b { font-size: 13px !important; line-height: 1.3; }
+  #ah-pane-soul > .ah-card:first-child > .ah-row:nth-child(2) { display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+  #ah-pane-soul > .ah-card:first-child > .ah-row:nth-child(2) #ah-soul-sync-selected { grid-column: 1 / -1; width: 100% !important; justify-content: center; order: -1; }
+  #ah-pane-soul > .ah-card:first-child > .ah-row:nth-child(2) .ah-btn { width: 100% !important; justify-content: center; text-align: center; padding: 8px 10px !important; }
+  #ah-soul-status { font-size: 11.5px !important; line-height: 1.45; word-break: break-all; }
+  #ah-soul-log { font-size: 11.5px; max-height: 180px; }
+  /* ========== 诊断区：窄屏网格化 ========== */
+  #ah-pane-diagnostic > .ah-row:first-of-type { display: grid !important; grid-template-columns: 1fr 88px; gap: 8px; align-items: center; }
+  #ah-pane-diagnostic > .ah-row:first-of-type #ah-diag-mode { grid-column: 1 / -1; width: 100% !important; }
+  #ah-pane-diagnostic > .ah-row:first-of-type #ah-diag-swipeId { width: 100% !important; min-width: 0 !important; }
+  #ah-pane-diagnostic > .ah-row:first-of-type #ah-diag-filter { grid-column: 1 / -1; width: 100% !important; flex: none !important; }
+  #ah-pane-diagnostic > .ah-row:nth-of-type(2) { display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  #ah-pane-diagnostic > .ah-row:nth-of-type(2) .ah-btn { width: 100% !important; justify-content: center; text-align: center; }
+  #ah-diag-meta { font-size: 12px !important; line-height: 1.5; }
+  #ah-diag-list { font-size: 12px !important; line-height: 1.55; max-height: 420px !important; }
+  /* ========== 预算区：状态与进度更易读 ========== */
+  #ah-pane-budget .ah-row { gap: 8px; }
+  #ah-pane-budget #ah-budget-breakdown { font-size: 11.5px !important; line-height: 1.5; max-height: 180px !important; }
+  #ah-pane-budget .ah-card .ah-row[style*="space-between"] { flex-wrap: wrap; gap: 6px; }
+  #ah-pane-budget .ah-card .ah-row .ah-badge { font-size: 11px; }
   /* EXtreme 工具栏：从左右分布改为纵向堆叠，输入框占满 */
   .ah-db-toolbar { padding: 10px 8px; }
   .ah-db-toolbar > .ah-row { flex-direction: column !important; align-items: stretch !important; gap: 8px !important; justify-content: flex-start !important; }
@@ -283,8 +419,6 @@
   .ah-db-filter { min-width: 0 !important; width: 100% !important; }
   #ah-extreme-limit { width: 100% !important; }
   #ah-extreme-query, #ah-extreme-clear { width: 100% !important; justify-content: center; padding: 8px 10px !important; font-size: 12px !important; }
-  /* 当过滤器为 2 列时，让查询/清空各占一列 */
-  /* 窄到 380 以下时改为单列，防止双列仍挤 */
   /* 短期池：减小横向挤压，下拉改为更易点击 */
   .ah-shortpool { max-height: 220px; padding: 10px 8px; }
   .ah-sp-item { padding: 6px 4px; gap: 8px; }
@@ -292,7 +426,7 @@
   .ah-select.ah-counter-edit { width: 86px; min-width: 86px; padding: 5px 6px; font-size: 12px; }
   /* 事件卡：字体清晰，头部换行更友好 */
   .ah-event-card { padding: 10px 10px; }
-  .ah-event-head { font-size: 12px; gap: 6px; }
+  .ah-event-head { font-size: 12px; gap: 6px; flex-wrap: wrap; }
   .ah-event-body { font-size: 12.5px; line-height: 1.55; -webkit-line-clamp: 5; }
   .ah-event-actions { flex-wrap: wrap; gap: 8px; }
   .ah-event-actions .ah-btn { padding: 6px 10px; font-size: 12px; }
@@ -306,15 +440,18 @@
   .ah-fess-stat { padding: 10px; }
   .ah-fess-stat b { font-size: 11px; }
   .ah-fess-stat span { font-size: 13px; }
-  .ah-iframe { height: 460px; }
+  .ah-iframe { height: 420px !important; }
   #ah-fess-probe-detail { font-size: 11.5px !important; line-height: 1.6 !important; word-break: break-word; }
+  /* LLM / Updater / 设置：按钮与输入框纵向友好 */
+  #ah-pane-llm > .ah-card > .ah-row, #ah-pane-updater > .ah-card > .ah-row, #ah-pane-settings > .ah-card .ah-row { flex-wrap: wrap; gap: 8px; }
+  #ah-pane-llm #ah-llm-apply, #ah-pane-llm #ah-llm-test { flex: 1 1 140px; justify-content: center; }
+  #ah-pane-llm .ah-col .ah-input { width: 100% !important; box-sizing: border-box; }
+  #ah-pane-updater #ah-check-updates { flex-shrink: 0; }
+  #ah-pane-settings .ah-input { font-size: 13px !important; }
   /* 表单控件在窄屏更大更易点 */
-  .ah-input, .ah-select { font-size: 13px !important; padding: 8px 10px !important; }
-  .ah-btn { padding: 7px 12px !important; font-size: 12.5px !important; }
+  .ah-input, .ah-select { font-size: 13px !important; padding: 8px 10px !important; min-height: 36px; box-sizing: border-box; }
+  .ah-btn { padding: 7px 12px !important; font-size: 12.5px !important; min-height: 36px; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; }
   .ah-btn.secondary { padding: 7px 12px !important; }
-  /* Soul 表格允许横滑，日志字体稍大 */
-  #ah-soul-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .ah-table { font-size: 12px; min-width: 520px; }
   .ah-log { font-size: 12px; line-height: 1.5; }
   /* 顶部标题行：允许换行，避免徽章被挤到看不清 */
   #archarness-panel > .ah-row:first-child { align-items: flex-start; gap: 8px; flex-direction: column !important; }
@@ -323,6 +460,9 @@
   /* 窄屏下把小字说明也放大，避免 10px 看不清 */
   .ah-db-toolbar div[style*="10px"] { font-size: 11.5px !important; line-height: 1.45 !important; }
   .ah-db-toolbar span[style*="11px"] { font-size: 12px !important; }
+  /* Toast 移动端居中贴底，不被抽屉裁切 */
+  #ah-toast { left: 8px !important; right: 8px !important; bottom: 12px !important; align-items: stretch; }
+  .ah-toast-item { width: 100%; box-sizing: border-box; }
 }
 
 @container ah (max-width: 380px) {
@@ -330,6 +470,43 @@
   .ah-fess-stats-grid { grid-template-columns: 1fr !important; }
   .ah-tabs { gap: 5px; }
   .ah-tab { padding: 7px 10px; font-size: 12px; }
+  /* 超窄屏下诊断第二行单列，Soul/预算按钮单列 */
+  #ah-pane-diagnostic > .ah-row:nth-of-type(2) { grid-template-columns: 1fr !important; }
+  #ah-pane-soul > .ah-card:first-child > .ah-row:nth-child(2) { grid-template-columns: 1fr !important; }
+  .ah-diag-action-row, .ah-soul-actions, .ah-budget-actions { grid-template-columns: 1fr !important; }
+  .ah-budget-metrics { grid-template-columns: 1fr !important; }
+  .ah-budget-metrics #ah-budget-pct { justify-self: start !important; }
+  .ah-iframe { height: 380px !important; }
+}
+
+/* Turbo Max 窄容器适配 */
+@container ah (max-width: 560px) {
+  .ah-turbo-wrap { top: 9px; right: 10px; }
+  .ah-turbo-gentle { padding: 6px 14px; font-size: 11.5px; }
+  .ah-gentle-bubble { max-width: 200px; font-size: 12px; white-space: normal; text-align: center; }
+  #archarness-panel > .ah-row:first-child { padding-right: 102px !important; }
+}
+@container ah (max-width: 380px) {
+  .ah-turbo-wrap { top: 9px; right: 8px; }
+  .ah-gentle-bubble::before { right: 18px; }
+}
+
+/* 预算/诊断/Soul 语义化窄屏兜底（同时兼容 :has 与显式 class） */
+@container ah (max-width: 560px) {
+  .ah-budget-metrics { display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px 10px; align-items: center; }
+  .ah-budget-metrics span { font-size: 12px !important; }
+  .ah-budget-metrics #ah-budget-pct { justify-self: end; align-self: center; }
+  .ah-budget-actions { display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ah-budget-actions .ah-btn { width: 100% !important; justify-content: center; }
+}
+@container ah (max-width: 380px) {
+  .ah-budget-metrics { grid-template-columns: 1fr !important; }
+  .ah-budget-metrics #ah-budget-pct { justify-self: start !important; }
+}
+@media (max-width: 560px) {
+  .ah-budget-metrics { display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ah-budget-actions { display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ah-budget-actions .ah-btn { width: 100% !important; }
 }
 
 /* 视口回退：不支持 @container 的旧浏览器用 @media 兜底（移动端视口本身就窄） */
@@ -337,6 +514,13 @@
   .archarness-panel { padding: 10px 8px; }
   .ah-health-grid { grid-template-columns: 1fr; }
   .ah-health-base { display: none !important; }
+  .ah-tabs { overflow-x: auto; flex-wrap: nowrap !important; -webkit-overflow-scrolling: touch; }
+  #ah-soul-table-wrap { overflow: visible !important; }
+  #ah-soul-table thead { display: none !important; }
+  #ah-soul-table, #ah-soul-table tbody, #ah-soul-table tr, #ah-soul-table td { display: block !important; width: 100% !important; box-sizing: border-box; }
+  #ah-soul-table tr { border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 10px; margin-bottom: 10px; background: rgba(10,10,15,0.92); }
+  #ah-soul-table td { display: flex !important; justify-content: space-between; border: none !important; border-bottom: 1px dashed rgba(255,255,255,0.06) !important; padding: 6px 0 !important; }
+  #ah-toast { left: 8px !important; right: 8px !important; }
 }
 
 #ah-toast {
