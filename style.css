@@ -7,6 +7,9 @@
   --ah-accent2: #7c3aed;
   --ah-text: #e4e4e7;
   --ah-sub: #a1a1aa;
+  /* 容器查询：让面板内部宽度决定布局，而非视口宽度（解决桌面抽屉窄但视口宽时仍挤爆） */
+  container-type: inline-size;
+  container-name: ah;
 }
 
 .archarness-panel {
@@ -14,6 +17,10 @@
   border: 1px solid var(--ah-border);
   border-radius: 12px;
   padding: 12px;
+  /* 防止窄容器横向溢出 */
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .ah-tabs {
@@ -131,6 +138,206 @@
 .ah-kv { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.06); }
 .ah-kv b { color: var(--ah-text); }
 .ah-kv span { color: var(--ah-sub); }
+
+/* ---------- 数据库 · 健康卡片 ---------- */
+.ah-health-grid {
+  display: grid;
+  /* 默认：auto-fit 自适应，窄容器自动单列；宽容器最多 3 列（3 卡） */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+  margin-bottom: 6px;
+}
+/* 视口回退（旧） */
+@media (max-width: 780px) { .ah-health-grid { grid-template-columns: 1fr; } }
+/* 容器查询：抽屉窄但视口宽时也能正确折叠，并保持可读间距 */
+@container ah (max-width: 560px) {
+  .ah-health-grid { grid-template-columns: 1fr; gap: 10px; }
+}
+@container ah (min-width: 561px) and (max-width: 780px) {
+  .ah-health-grid { grid-template-columns: 1fr 1fr; }
+}
+@container ah (min-width: 781px) {
+  .ah-health-grid { grid-template-columns: repeat(3, 1fr); }
+}
+.ah-health-card {
+  background: linear-gradient(180deg, rgba(22,22,30,0.98), rgba(16,16,22,0.96));
+  border: 1px solid var(--ah-border);
+  border-radius: 10px;
+  padding: 9px 10px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.15s;
+  cursor: pointer;
+}
+.ah-health-card:hover { border-color: rgba(124,58,237,0.28); transform: translateY(-1px); }
+.ah-health-card.ah-health-ok { border-color: rgba(34,197,94,0.28); }
+.ah-health-card.ah-health-warn { border-color: rgba(234,179,8,0.28); }
+.ah-health-card.ah-health-fail { border-color: rgba(239,68,68,0.32); }
+.ah-health-card.ah-health-checking { opacity: 0.9; }
+.ah-health-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.ah-health-title { font-weight: 700; font-size: 12px; color: var(--ah-text); display:flex; align-items:center; gap:6px; }
+.ah-health-port { font-weight: 400; color: var(--ah-sub); font-size: 10px; }
+.ah-health-meta { display:flex; gap:6px; align-items:center; font-size: 11px; color: var(--ah-sub); margin-top:4px; }
+.ah-health-sep { opacity:0.4; }
+.ah-health-endpoint { font-family: monospace; font-size: 10px; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 5px; max-width: 120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ah-health-base { font-size: 10px; color: #71717a; margin-top:3px; word-break: break-all; line-height:1.2; }
+.ah-health-detail { font-size: 11px; color: var(--ah-sub); margin-top:5px; line-height:1.4; min-height: 16px; }
+.ah-dot {
+  width: 8px; height: 8px; border-radius: 999px; display:inline-block; flex-shrink:0;
+  background: #71717a; box-shadow: 0 0 0 3px rgba(113,113,122,0.18);
+  animation: ah-pulse 1.6s infinite;
+}
+.ah-dot.ok { background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,0.2); animation:none; }
+.ah-dot.warn { background:#eab308; box-shadow:0 0 0 3px rgba(234,179,8,0.2); }
+.ah-dot.fail { background:#ef4444; box-shadow:0 0 0 3px rgba(239,68,68,0.2); }
+.ah-dot.checking { background:#71717a; }
+@keyframes ah-pulse { 0%,100%{ opacity:1 } 50%{ opacity:0.55 } }
+
+.ah-tabs-sub { margin-bottom: 8px; padding-bottom: 6px; }
+.ah-tabs-sub .ah-tab { padding: 5px 10px; font-size: 11px; }
+
+/* ---------- 数据库 · 工具栏 ---------- */
+.ah-db-toolbar { padding: 10px; }
+.ah-db-filters { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:8px; }
+.ah-db-filter { min-width: 90px; }
+.ah-shortpool { background: rgba(10,10,15,0.9); border:1px solid var(--ah-border); border-radius:8px; padding:8px; max-height:190px; overflow:auto; }
+.ah-shortpool:empty::before { content:'暂无短期池数据'; color:var(--ah-sub); font-size:11px; }
+.ah-sp-group { margin-bottom:10px; }
+.ah-sp-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+.ah-sp-title { font-weight:700; font-size:11px; color:var(--ah-text); }
+.ah-sp-count { font-size:10px; color:var(--ah-sub); }
+.ah-sp-item { display:flex; gap:6px; align-items:center; padding:4px 6px; border-radius:6px; transition: background 0.12s; }
+.ah-sp-item:hover { background: rgba(255,255,255,0.04); }
+.ah-sp-cid { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; min-width:0; }
+.ah-badge-c0 { background: rgba(239,68,68,0.14); color:#fca5a5; border-color:rgba(239,68,68,0.28); }
+.ah-badge-c1 { background: rgba(249,115,22,0.14); color:#fed7aa; border-color:rgba(249,115,22,0.28); }
+.ah-badge-c2 { background: rgba(59,130,246,0.14); color:#bfdbfe; border-color:rgba(59,130,246,0.28); }
+.ah-badge-c3 { background: rgba(34,197,94,0.16); color:#bbf7d0; border-color:rgba(34,197,94,0.28); }
+
+/* ---------- 事件列表 ---------- */
+.ah-event-list { display:flex; flex-direction:column; gap:6px; max-height:360px; overflow:auto; padding-right:2px; }
+.ah-event-card { background: rgba(10,10,15,0.92); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:8px 9px; transition: border-color 0.15s; }
+.ah-event-card:hover { border-color: rgba(124,58,237,0.22); }
+.ah-event-head { display:flex; gap:6px; align-items:center; flex-wrap:wrap; font-size:11px; }
+.ah-event-id { font-family: monospace; font-weight:700; color:var(--ah-text); }
+.ah-event-bucket { color:var(--ah-sub); font-size:10px; }
+.ah-event-souls { display:flex; gap:4px; flex-wrap:wrap; }
+.ah-event-soul { font-size:10px; padding:1px 5px; border-radius:999px; background:rgba(124,58,237,0.16); color:#c4b5fd; border:1px solid rgba(124,58,237,0.28); }
+.ah-event-body { margin-top:6px; font-size:12px; line-height:1.5; white-space:pre-wrap; word-break:break-word; color:#e4e4e7; display:-webkit-box; -webkit-line-clamp:6; -webkit-box-orient:vertical; overflow:hidden; cursor:pointer; }
+.ah-event-body.expanded { -webkit-line-clamp:unset; }
+.ah-event-actions { display:flex; gap:6px; margin-top:7px; align-items:center; }
+.ah-event-actions .ah-btn { padding:3px 8px; font-size:11px; }
+.ah-select.ah-counter-edit { width:82px; padding:3px 6px; font-size:11px; }
+
+/* ---------- ViGil ---------- */
+.ah-vigil-list { display:flex; flex-direction:column; gap:8px; max-height:360px; overflow:auto; padding-right:2px; }
+.ah-vigil-card { background: rgba(10,10,15,0.9); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:8px 9px; }
+.ah-vigil-head { display:flex; justify-content:space-between; align-items:center; gap:6px; }
+.ah-vigil-id { font-weight:700; font-family:monospace; font-size:11px; color:var(--ah-text); }
+.ah-vigil-status { font-size:10px; }
+.ah-vigil-field { display:flex; justify-content:space-between; gap:10px; font-size:11px; padding:2px 0; border-bottom:1px dashed rgba(255,255,255,0.05); }
+.ah-vigil-field b { color:#d4d4d8; font-weight:600; min-width: 64px; }
+.ah-vigil-field span { color: var(--ah-sub); text-align:right; word-break:break-word; flex:1; }
+.ah-vigil-topic { margin-top:6px; font-size:11px; line-height:1.45; color:#e4e4e7; background:rgba(255,255,255,0.03); padding:6px 7px; border-radius:6px; white-space:pre-wrap; word-break:break-word; max-height:88px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; cursor:pointer; }
+.ah-vigil-topic.expanded { -webkit-line-clamp:unset; max-height:none; }
+.ah-part-tag { display:inline-block; font-size:10px; padding:1px 5px; border-radius:999px; background:rgba(59,130,246,0.14); border:1px solid rgba(59,130,246,0.24); color:#bfdbfe; margin:1px 2px; }
+
+/* ---------- Fess ---------- */
+.ah-fess-stats-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap:6px; margin-top:8px; }
+.ah-fess-stat { background: rgba(10,10,15,0.88); border:1px solid var(--ah-border); border-radius:8px; padding:8px; }
+.ah-fess-stat b { font-size:10px; color:var(--ah-sub); display:block; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; }
+.ah-fess-stat span { font-size:14px; font-weight:700; color:var(--ah-text); margin-top:2px; display:block; word-break:break-all; }
+.ah-fess-tab.active { background: rgba(124,58,237,0.18) !important; border-color: rgba(124,58,237,0.32) !important; color:#ddd6fe !important; }
+.ah-iframe-wrap { position:relative; margin-top:8px; }
+.ah-iframe-placeholder { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--ah-sub); background: rgba(10,10,15,0.72); border:1px dashed var(--ah-border); border-radius:10px; pointer-events:none; text-align:center; padding:0 12px; }
+.ah-iframe-wrap.has-src .ah-iframe-placeholder { display:none; }
+.ah-iframe { width:100%; height:520px; border:1px solid var(--ah-border); border-radius:10px; background:white; }
+
+/* ================= 移动端 / 窄容器优化（抽屉宽度 <560px 即使视口是桌面） ================= */
+@container ah (max-width: 560px) {
+  .archarness-panel { padding: 10px 8px; border-radius: 10px; }
+  /* 顶部 Tab 触控更大 */
+  .ah-tabs { gap: 6px; }
+  .ah-tab { padding: 8px 11px; font-size: 12.5px; line-height: 1.1; }
+  .ah-tabs-sub .ah-tab { padding: 7px 12px; font-size: 12px; }
+  /* 健康卡：已在上方折为单列，此处细化可读性 */
+  .ah-health-card { padding: 11px 12px; border-radius: 12px; }
+  .ah-health-title { font-size: 13px; }
+  .ah-health-port { font-size: 11px; }
+  .ah-health-meta { font-size: 12px; margin-top: 6px; }
+  .ah-health-endpoint { font-size: 11px; max-width: none; padding: 2px 7px; }
+  .ah-health-base { display: none !important; } /* 窄屏隐藏完整 http://...，减少换行噪音，完整地址仍在设置页可见 */
+  .ah-health-detail { font-size: 12px; line-height: 1.45; margin-top: 6px; }
+  /* 健康底部那一行：上次检测 + 刷新按钮 + 说明 — 窄屏改为纵向堆叠，Fess 说明不再 10px 看不清 */
+  #ah-health-last { font-size: 11px !important; line-height: 1.4; }
+  #ah-health-grid + .ah-row { flex-direction: column !important; align-items: stretch !important; gap: 8px !important; }
+  #ah-health-grid + .ah-row .ah-row { width: 100% !important; justify-content: flex-start !important; flex-wrap: wrap !important; gap: 8px !important; }
+  #ah-health-grid + .ah-row .ah-row span { font-size: 11px !important; line-height: 1.4 !important; white-space: normal !important; margin-left: 0 !important; }
+  #ah-health-refresh { padding: 7px 12px !important; font-size: 12px !important; }
+  /* EXtreme 工具栏：从左右分布改为纵向堆叠，输入框占满 */
+  .ah-db-toolbar { padding: 10px 8px; }
+  .ah-db-toolbar > .ah-row { flex-direction: column !important; align-items: stretch !important; gap: 8px !important; justify-content: flex-start !important; }
+  .ah-db-toolbar > .ah-row > .ah-row { width: 100% !important; justify-content: flex-start !important; }
+  #ah-extreme-chat { min-width: 0 !important; width: 100% !important; flex: 1 1 auto !important; }
+  .ah-db-filters { display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .ah-db-filter { min-width: 0 !important; width: 100% !important; }
+  #ah-extreme-limit { width: 100% !important; }
+  #ah-extreme-query, #ah-extreme-clear { width: 100% !important; justify-content: center; padding: 8px 10px !important; font-size: 12px !important; }
+  /* 当过滤器为 2 列时，让查询/清空各占一列 */
+  /* 窄到 380 以下时改为单列，防止双列仍挤 */
+  /* 短期池：减小横向挤压，下拉改为更易点击 */
+  .ah-shortpool { max-height: 220px; padding: 10px 8px; }
+  .ah-sp-item { padding: 6px 4px; gap: 8px; }
+  .ah-sp-cid { font-size: 12px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .ah-select.ah-counter-edit { width: 86px; min-width: 86px; padding: 5px 6px; font-size: 12px; }
+  /* 事件卡：字体清晰，头部换行更友好 */
+  .ah-event-card { padding: 10px 10px; }
+  .ah-event-head { font-size: 12px; gap: 6px; }
+  .ah-event-body { font-size: 12.5px; line-height: 1.55; -webkit-line-clamp: 5; }
+  .ah-event-actions { flex-wrap: wrap; gap: 8px; }
+  .ah-event-actions .ah-btn { padding: 6px 10px; font-size: 12px; }
+  /* ViGil 双列改单列 */
+  .ah-split { grid-template-columns: 1fr !important; gap: 10px; }
+  .ah-vigil-card { padding: 10px 10px; }
+  .ah-vigil-field { font-size: 12px; }
+  .ah-vigil-topic { font-size: 12px; max-height: 96px; }
+  /* Fess 统计与 iframe */
+  .ah-fess-stats-grid { grid-template-columns: 1fr 1fr !important; }
+  .ah-fess-stat { padding: 10px; }
+  .ah-fess-stat b { font-size: 11px; }
+  .ah-fess-stat span { font-size: 13px; }
+  .ah-iframe { height: 460px; }
+  #ah-fess-probe-detail { font-size: 11.5px !important; line-height: 1.6 !important; word-break: break-word; }
+  /* 表单控件在窄屏更大更易点 */
+  .ah-input, .ah-select { font-size: 13px !important; padding: 8px 10px !important; }
+  .ah-btn { padding: 7px 12px !important; font-size: 12.5px !important; }
+  .ah-btn.secondary { padding: 7px 12px !important; }
+  /* Soul 表格允许横滑，日志字体稍大 */
+  #ah-soul-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .ah-table { font-size: 12px; min-width: 520px; }
+  .ah-log { font-size: 12px; line-height: 1.5; }
+  /* 顶部标题行：允许换行，避免徽章被挤到看不清 */
+  #archarness-panel > .ah-row:first-child { align-items: flex-start; gap: 8px; flex-direction: column !important; }
+  #archarness-panel > .ah-row:first-child .ah-row { flex-wrap: wrap; gap: 6px; }
+  #archarness-panel > .ah-row:first-child b { font-size: 15px !important; }
+  /* 窄屏下把小字说明也放大，避免 10px 看不清 */
+  .ah-db-toolbar div[style*="10px"] { font-size: 11.5px !important; line-height: 1.45 !important; }
+  .ah-db-toolbar span[style*="11px"] { font-size: 12px !important; }
+}
+
+@container ah (max-width: 380px) {
+  .ah-db-filters { grid-template-columns: 1fr !important; }
+  .ah-fess-stats-grid { grid-template-columns: 1fr !important; }
+  .ah-tabs { gap: 5px; }
+  .ah-tab { padding: 7px 10px; font-size: 12px; }
+}
+
+/* 视口回退：不支持 @container 的旧浏览器用 @media 兜底（移动端视口本身就窄） */
+@media (max-width: 560px) {
+  .archarness-panel { padding: 10px 8px; }
+  .ah-health-grid { grid-template-columns: 1fr; }
+  .ah-health-base { display: none !important; }
+}
 
 #ah-toast {
   position: fixed;

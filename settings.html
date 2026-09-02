@@ -2,7 +2,7 @@
   <div class="ah-row" style="justify-content:space-between; margin-bottom:8px;">
     <div class="ah-row">
       <b style="font-size:14px;">ArcHarness</b>
-      <span class="ah-badge">v0.1.0</span>
+      <span class="ah-badge">v0.2.0</span>
       <span id="ah-status" class="ah-badge ok">就绪</span>
     </div>
     <div class="ah-row">
@@ -15,7 +15,7 @@
     <div class="ah-tab active" data-tab="budget">预算仪表</div>
     <div class="ah-tab" data-tab="diagnostic">诊断</div>
     <div class="ah-tab" data-tab="soul">Soul统筹</div>
-    <div class="ah-tab" data-tab="db">三库</div>
+    <div class="ah-tab" data-tab="db">数据库</div>
     <div class="ah-tab" data-tab="llm">LLM批量</div>
     <div class="ah-tab" data-tab="updater">更新</div>
     <div class="ah-tab" data-tab="settings">设置</div>
@@ -92,53 +92,157 @@
     <div id="ah-soul-log" class="ah-log" style="max-height:160px;"></div>
   </div>
 
-  <!-- 三库 -->
+  <!-- 数据库 -->
   <div class="ah-pane" id="ah-pane-db">
-    <div class="ah-tabs" style="margin-bottom:6px;">
+    <!-- 健康总览 -->
+    <div class="ah-health-grid" id="ah-health-grid">
+      <div class="ah-health-card" data-health="extreme" id="ah-health-card-extreme">
+        <div class="ah-health-head">
+          <div class="ah-health-title"><span class="ah-dot" id="ah-health-dot-extreme"></span> EXtreme <span class="ah-health-port">:9001</span></div>
+          <span class="ah-badge" id="ah-health-badge-extreme">检测中</span>
+        </div>
+        <div class="ah-health-meta">
+          <span id="ah-health-latency-extreme">— ms</span>
+          <span class="ah-health-sep">·</span>
+          <span id="ah-health-endpoint-extreme" class="ah-health-endpoint">—</span>
+        </div>
+        <div class="ah-health-base" id="ah-health-base-extreme">—</div>
+        <div class="ah-health-detail" id="ah-health-detail-extreme">等待检测</div>
+      </div>
+      <div class="ah-health-card" data-health="vigil" id="ah-health-card-vigil">
+        <div class="ah-health-head">
+          <div class="ah-health-title"><span class="ah-dot" id="ah-health-dot-vigil"></span> ViGil <span class="ah-health-port">:9000</span></div>
+          <span class="ah-badge" id="ah-health-badge-vigil">检测中</span>
+        </div>
+        <div class="ah-health-meta">
+          <span id="ah-health-latency-vigil">— ms</span>
+          <span class="ah-health-sep">·</span>
+          <span id="ah-health-endpoint-vigil" class="ah-health-endpoint">—</span>
+        </div>
+        <div class="ah-health-base" id="ah-health-base-vigil">—</div>
+        <div class="ah-health-detail" id="ah-health-detail-vigil">等待检测</div>
+      </div>
+      <div class="ah-health-card" data-health="fess" id="ah-health-card-fess">
+        <div class="ah-health-head">
+          <div class="ah-health-title"><span class="ah-dot" id="ah-health-dot-fess"></span> Fess <span class="ah-health-port">:8999</span></div>
+          <span class="ah-badge" id="ah-health-badge-fess">检测中</span>
+        </div>
+        <div class="ah-health-meta">
+          <span id="ah-health-latency-fess">— ms</span>
+          <span class="ah-health-sep">·</span>
+          <span id="ah-health-endpoint-fess" class="ah-health-endpoint">—</span>
+        </div>
+        <div class="ah-health-base" id="ah-health-base-fess">—</div>
+        <div class="ah-health-detail" id="ah-health-detail-fess">多端点探测（含静态资源）</div>
+      </div>
+    </div>
+    <div class="ah-row" style="justify-content:space-between; margin:6px 0 8px;">
+      <span id="ah-health-last" style="font-size:11px; color:var(--ah-sub);">上次检测: —</span>
+      <div class="ah-row">
+        <div id="ah-health-refresh" class="ah-btn secondary" style="padding:4px 10px; font-size:11px;">↻ 刷新健康</div>
+        <span style="font-size:10px; color:#71717a; margin-left:4px;">Fess 无标准心跳，已启用静态资源探测</span>
+      </div>
+    </div>
+
+    <div class="ah-tabs ah-tabs-sub" style="margin-bottom:8px;">
       <div class="ah-tab active" data-dbtab="extreme">EXtreme</div>
       <div class="ah-tab" data-dbtab="vigil">ViGil</div>
       <div class="ah-tab" data-dbtab="fess">Fess</div>
     </div>
 
     <div id="ah-db-extreme" class="ah-pane active">
-      <div class="ah-card">
-        <div class="ah-row">
-          <b>EXtreme</b><span id="ah-extreme-status" class="ah-badge">-</span>
-          <select id="ah-extreme-chat" class="ah-select" style="flex:1;"><option value="">选择 chat_id</option></select>
-          <div id="ah-extreme-reload" class="ah-btn secondary" style="padding:4px 8px;">刷新</div>
+      <div class="ah-card ah-db-toolbar">
+        <div class="ah-row" style="justify-content:space-between;">
+          <div class="ah-row">
+            <b style="font-size:13px;">EXtreme</b>
+            <span id="ah-extreme-status" class="ah-badge">-</span>
+            <span id="ah-extreme-statline" style="font-size:11px; color:var(--ah-sub);"></span>
+          </div>
+          <div class="ah-row">
+            <select id="ah-extreme-chat" class="ah-select" style="min-width:180px; flex:1;"><option value="">选择 chat_id</option></select>
+            <div id="ah-extreme-reload" class="ah-btn secondary" style="padding:4px 10px; font-size:11px;">↻ 刷新</div>
+          </div>
         </div>
-        <div class="ah-row" style="margin-top:6px;">
-          <select id="ah-extreme-soul-filter" class="ah-select"><option value="">全部Soul</option></select>
-          <select id="ah-extreme-counter-filter" class="ah-select"><option value="">全部2bit</option><option value="0">0强拒</option><option value="1">1弱拒</option><option value="2">2弱接</option><option value="3">3强接</option></select>
-          <input id="ah-extreme-limit" type="number" class="ah-input" value="50" style="width:60px;" />
-          <div id="ah-extreme-query" class="ah-btn secondary">查询</div>
-          <div id="ah-extreme-clear" class="ah-btn secondary" style="background:rgba(208,30,59,0.2);">清空本chat</div>
+        <div class="ah-db-filters">
+          <select id="ah-extreme-soul-filter" class="ah-select ah-db-filter"><option value="">全部Soul</option></select>
+          <select id="ah-extreme-counter-filter" class="ah-select ah-db-filter"><option value="">全部2bit</option><option value="0">0 强拒</option><option value="1">1 弱拒</option><option value="2">2 弱接</option><option value="3">3 强接</option></select>
+          <input id="ah-extreme-limit" type="number" class="ah-input ah-db-filter" value="50" style="width:70px;" title="查询条数" />
+          <div id="ah-extreme-query" class="ah-btn secondary" style="padding:5px 10px; font-size:11px;">查询事件</div>
+          <div id="ah-extreme-clear" class="ah-btn" style="padding:5px 10px; font-size:11px; background:linear-gradient(135deg,#ef4444,#dc2626);">清空本chat</div>
         </div>
-        <div id="ah-extreme-shortpool" class="ah-card" style="max-height:160px; overflow:auto; font-size:11px; margin-top:6px;"></div>
+        <div id="ah-extreme-shortpool" class="ah-shortpool" style="margin-top:8px;"></div>
       </div>
-      <div id="ah-extreme-events" class="ah-log" style="max-height:300px;"></div>
+      <div class="ah-card">
+        <div class="ah-row" style="justify-content:space-between; margin-bottom:6px;">
+          <b style="font-size:12px;">事件列表</b>
+          <span style="font-size:11px; color:var(--ah-sub);" id="ah-extreme-events-count">—</span>
+        </div>
+        <div id="ah-extreme-events" class="ah-event-list"></div>
+        <div id="ah-extreme-events-empty" style="display:none; text-align:center; padding:18px; color:var(--ah-sub); font-size:12px;">暂无事件 — 请先查询或切换 chat</div>
+      </div>
     </div>
 
     <div id="ah-db-vigil" class="ah-pane">
-      <div class="ah-card">
-        <div class="ah-row"><b>ViGil</b><div id="ah-vigil-refresh" class="ah-btn secondary">刷新</div></div>
-        <div id="ah-vigil-tasks" class="ah-log" style="max-height:200px;"></div>
-        <div id="ah-vigil-messages" class="ah-log" style="max-height:200px; margin-top:6px;"></div>
+      <div class="ah-card ah-db-toolbar">
+        <div class="ah-row" style="justify-content:space-between;">
+          <div class="ah-row">
+            <b style="font-size:13px;">ViGil</b>
+            <span id="ah-vigil-status" class="ah-badge">-</span>
+            <span id="ah-vigil-statline" style="font-size:11px; color:var(--ah-sub);"></span>
+          </div>
+          <div id="ah-vigil-refresh" class="ah-btn secondary" style="padding:4px 10px; font-size:11px;">↻ 刷新</div>
+        </div>
+        <div style="font-size:10px; color:#71717a; margin-top:4px;">心跳: <code>/api/tasks</code> / <code>/api/messages</code> · 自动解析 participants / topic 等字段</div>
+      </div>
+      <div class="ah-split">
+        <div class="ah-card" style="margin-bottom:0;">
+          <div class="ah-row" style="justify-content:space-between; margin-bottom:6px;">
+            <b style="font-size:12px;">Tasks</b>
+            <span id="ah-vigil-tasks-count" class="ah-badge">—</span>
+          </div>
+          <div id="ah-vigil-tasks" class="ah-vigil-list"></div>
+        </div>
+        <div class="ah-card" style="margin-bottom:0;">
+          <div class="ah-row" style="justify-content:space-between; margin-bottom:6px;">
+            <b style="font-size:12px;">Messages</b>
+            <span id="ah-vigil-messages-count" class="ah-badge">—</span>
+          </div>
+          <div id="ah-vigil-messages" class="ah-vigil-list"></div>
+        </div>
+      </div>
+      <div id="ah-vigil-raw" style="display:none;">
+        <div id="ah-vigil-tasks-raw" class="ah-log"></div>
+        <div id="ah-vigil-messages-raw" class="ah-log"></div>
       </div>
     </div>
 
     <div id="ah-db-fess" class="ah-pane">
-      <div class="ah-card">
-        <div class="ah-row"><b>Fess</b><span id="ah-fess-status" class="ah-badge">-</span><div id="ah-fess-refresh" class="ah-btn secondary">刷新状态</div><div id="ah-fess-open-board" class="ah-btn secondary">新窗打开 Databoard</div></div>
-        <div id="ah-fess-stats" class="ah-log" style="max-height:120px;"></div>
-        <div class="ah-row" style="margin-top:6px;">
-          <div id="ah-fess-tab-board" class="ah-btn secondary">Databoard</div>
-          <div id="ah-fess-tab-query" class="ah-btn secondary">QueryLab</div>
-          <div id="ah-fess-tab-story" class="ah-btn secondary">StoryMap</div>
-          <div id="ah-fess-tab-flow" class="ah-btn secondary">FlowLab</div>
+      <div class="ah-card ah-db-toolbar">
+        <div class="ah-row" style="justify-content:space-between;">
+          <div class="ah-row">
+            <b style="font-size:13px;">Fess</b>
+            <span id="ah-fess-status" class="ah-badge">-</span>
+            <span id="ah-fess-probe-line" style="font-size:11px; color:var(--ah-sub);"></span>
+          </div>
+          <div class="ah-row">
+            <div id="ah-fess-refresh" class="ah-btn secondary" style="padding:4px 10px; font-size:11px;">↻ 刷新状态</div>
+            <div id="ah-fess-open-board" class="ah-btn secondary" style="padding:4px 10px; font-size:11px;">新窗打开</div>
+          </div>
+        </div>
+        <div class="ah-fess-stats-grid" id="ah-fess-stats-grid"></div>
+        <div id="ah-fess-stats" class="ah-log" style="max-height:120px; display:none;"></div>
+        <div id="ah-fess-probe-detail" style="font-size:11px; color:var(--ah-sub); margin-top:6px; line-height:1.5;"></div>
+        <div class="ah-row" style="margin-top:8px; gap:6px;">
+          <div id="ah-fess-tab-board" class="ah-btn secondary ah-fess-tab active" data-fess-tab="board">Databoard</div>
+          <div id="ah-fess-tab-query" class="ah-btn secondary ah-fess-tab" data-fess-tab="query">QueryLab</div>
+          <div id="ah-fess-tab-story" class="ah-btn secondary ah-fess-tab" data-fess-tab="story">StoryMap</div>
+          <div id="ah-fess-tab-flow" class="ah-btn secondary ah-fess-tab" data-fess-tab="flow">FlowLab</div>
         </div>
       </div>
-      <iframe id="ah-fess-iframe" class="ah-iframe" src="about:blank"></iframe>
+      <div class="ah-iframe-wrap">
+        <iframe id="ah-fess-iframe" class="ah-iframe" src="about:blank" loading="lazy"></iframe>
+        <div id="ah-fess-iframe-placeholder" class="ah-iframe-placeholder">选择上方标签加载页面 · 首次加载可能需 1-2 秒</div>
+      </div>
     </div>
   </div>
 
@@ -202,7 +306,7 @@
     <div class="ah-card">
       <b>关于</b>
       <div style="font-size:11px; color:#a1a1aa; line-height:1.6;">
-        ArcHarness v0.1.0 — Arc 套件中枢<br/>
+        ArcHarness v0.2.0 — Arc 套件中枢<br/>
         Soul: EXtreme 主 → ViGil 镜像 (单向)<br/>
         诊断: Fetch 真实 + Interceptor 预测 双轨<br/>
         预算: oai_settings.openai_max_context<br/>

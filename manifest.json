@@ -7,7 +7,7 @@
   "js": "index.js",
   "css": "style.css",
   "author": "kerjc4464",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homePage": "https://github.com/kerjc4464/ArcHarness",
-  "description": "Arc 套件中枢：Soul同步(Ext→ViGil)/三库查看/LLM批量分组(含Embedding隔离)/更新检查/预算仪表/双轨诊断(Sim+Replay)"
+  "description": "Arc 套件中枢：Soul同步(Ext→ViGil)/数据库查看/LLM批量分组(含Embedding隔离)/更新检查/预算仪表/双轨诊断(Sim+Replay)"
 }
