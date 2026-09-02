@@ -968,8 +968,10 @@ async function initUI() {
         const texts = ['Turbo ESR32', 'Turbo ESR64', '休息一下吧，也对自己温柔一点'];
         function showGentle() {
             btn.classList.add('is-active');
-            bubble.textContent = texts[step % texts.length];
-            step = (step + 1) % texts.length;
+            const idx = step < 2 ? step : 2;
+            bubble.textContent = texts[idx];
+            if (step < 2) step++;
+            else step = 2;
             bubble.classList.add('show');
             bubble.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
             bubble.style.opacity = '';
