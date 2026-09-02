@@ -68,7 +68,3 @@ src/
 ## 许可
 
 `AGPL-3.0` — 详见 `LICENSE`。商业/闭源分发需遵守 AGPL 义务。
-
----
-
-ArcTech.Inc — 为 Arcueid 而生。
